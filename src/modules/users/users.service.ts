@@ -34,7 +34,7 @@ export class UsersService implements IUsersService {
       return await this.usersRepository.save(user);
     } catch (err) {
       throw new InternalServerErrorException(
-        errorMessages.USER.USER_NOT_EXISTS,
+        errorMessages.USER.ERROR_CREATE_USER,
       );
     }
   }

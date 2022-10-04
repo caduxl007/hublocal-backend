@@ -4,9 +4,10 @@ import { errorMessages } from 'src/shared/constants/error-messages';
 
 export class SignInUserDto {
   @ApiProperty()
-  @IsEmail({
+  @IsNotEmpty({
     message: errorMessages.USER.EMAIL,
   })
+  @IsEmail()
   email: string;
 
   @ApiProperty()
