@@ -26,4 +26,9 @@ export class CompaniesController {
   findOne(@GetUser() user: User, @Param('id') id: string): Promise<Company> {
     return this.companiesService.findOne(id, user);
   }
+
+  @Get()
+  findAll(@GetUser() user: User) {
+    return this.companiesService.findAll(user);
+  }
 }

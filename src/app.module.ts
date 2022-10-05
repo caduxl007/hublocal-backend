@@ -6,6 +6,7 @@ import { UsersModule } from './modules/users/users.module';
 import { CompaniesModule } from './modules/companies/companies.module';
 import { AddressModule } from './modules/address/address.module';
 import { PlacesModule } from './modules/places/places.module';
+import { ResponsiblesModule } from './modules/responsibles/responsibles.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { PlacesModule } from './modules/places/places.module';
     CompaniesModule,
     AddressModule,
     PlacesModule,
+    ResponsiblesModule,
   ],
   controllers: [],
   providers: [],

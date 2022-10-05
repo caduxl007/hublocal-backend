@@ -54,4 +54,17 @@ export class CompaniesService {
 
     return company;
   }
+
+  async findAll(user: User): Promise<Company[]> {
+    const companies = await this.companyRepository.find({
+      where: {
+        user: {
+          id: user.id,
+        },
+      },
+      relations: ['places', 'responsibles'],
+    });
+
+    return companies;
+  }
 }
