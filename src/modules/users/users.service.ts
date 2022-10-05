@@ -21,6 +21,7 @@ export class UsersService implements IUsersService {
 
   async create(dto: CreateUserDto) {
     const { name, email, password } = dto;
+    //TO-DO: Validar e-mail
 
     const hashedPassword = await this.hashedPassword(password);
 
@@ -50,6 +51,8 @@ export class UsersService implements IUsersService {
     if (!user) {
       throw new NotFoundException(errorMessages.USER.USER_NOT_EXISTS);
     }
+
+    delete user.password;
 
     return user;
   }

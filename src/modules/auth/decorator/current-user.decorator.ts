@@ -4,6 +4,11 @@ import { User } from 'src/modules/users/model/entities/user.entity';
 export const GetUser = createParamDecorator(
   (data: unknown, ctx: ExecutionContext): User => {
     const request = ctx.switchToHttp().getRequest();
-    return request.user;
+
+    const user = request.user;
+
+    delete user?.password;
+
+    return user;
   },
 );

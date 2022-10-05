@@ -3,6 +3,9 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
+import { CompaniesModule } from './modules/companies/companies.module';
+import { AddressModule } from './modules/address/address.module';
+import { PlacesModule } from './modules/places/places.module';
 
 @Module({
   imports: [
@@ -26,6 +29,9 @@ import { UsersModule } from './modules/users/users.module';
     }),
     UsersModule,
     AuthModule,
+    CompaniesModule,
+    AddressModule,
+    PlacesModule,
   ],
   controllers: [],
   providers: [],
