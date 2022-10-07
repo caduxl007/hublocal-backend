@@ -40,11 +40,15 @@ $ docker run --name "nome-que-quiser" -e POSTGRES_PASSWORD=docker -p 5434:5432 -
 $ nome da database: hublocal
 $ port: 5434
 
+
 # Acesse a pasta do projeto backend no terminal/cmd
 $ cd hublocal-backend-
 
 Instale as dependências
 $ yarn
+
+# Utilize a .env.example
+
 
 # Execute a aplicação
 $ yarn start:dev
