@@ -27,7 +27,7 @@ import { TicketsModule } from './modules/tickets/tickets.module';
               rejectUnauthorized: false,
             },
       logging: true,
-      synchronize: true,
+      synchronize: process.env.NODE_ENV === 'production' ? false : true,
       dropSchema: false,
       entities: [`${__dirname}/src/**/**.entity{.ts,.js}`],
       migrations: [`${__dirname}/src/migrations/**/*{.ts,.js}`],
