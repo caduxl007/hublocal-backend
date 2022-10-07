@@ -7,6 +7,7 @@ import { CompaniesModule } from './modules/companies/companies.module';
 import { AddressModule } from './modules/address/address.module';
 import { PlacesModule } from './modules/places/places.module';
 import { ResponsiblesModule } from './modules/responsibles/responsibles.module';
+import { TicketsModule } from './modules/tickets/tickets.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { ResponsiblesModule } from './modules/responsibles/responsibles.module';
     AddressModule,
     PlacesModule,
     ResponsiblesModule,
+    TicketsModule,
   ],
   controllers: [],
   providers: [],

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -7,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../users/model/entities/user.entity';
 import { CreateCompanyDto } from './dto/create-company.dto';
+import { UpdateCompanyDto } from './dto/update-company.dto';
 import { Company } from './entities/company.entity';
 
 @Injectable()
@@ -32,9 +34,13 @@ export class CompaniesService {
     try {
       return await this.companyRepository.save(company);
     } catch (err) {
-      throw new InternalServerErrorException(
-        'Houve uma falha ao tentar criar uma empresa',
-      );
+      if (err.code === '23505') {
+        throw new BadRequestException('Já existe uma empresa com esse CNPJ');
+      } else {
+        throw new InternalServerErrorException(
+          'Houve uma falha ao tentar criar uma empresa',
+        );
+      }
     }
   }
 
@@ -46,6 +52,7 @@ export class CompaniesService {
           id: user.id,
         },
       },
+      relations: ['responsibles', 'places'],
     });
 
     if (!company) {
@@ -62,9 +69,41 @@ export class CompaniesService {
           id: user.id,
         },
       },
+      order: {
+        createdAt: 'DESC',
+      },
       relations: ['places', 'responsibles'],
     });
 
     return companies;
+  }
+
+  async remove(id: string, user: User): Promise<void> {
+    const company = await this.findOne(id, user);
+
+    try {
+      await this.companyRepository.remove(company);
+    } catch (err) {
+      throw new InternalServerErrorException(
+        'Houve uma falha ao tentar deletar a empresa',
+      );
+    }
+  }
+
+  async update(id: string, updateCompanyDto: UpdateCompanyDto, user: User) {
+    let company = await this.findOne(id, user);
+
+    company = Object.assign(company, {
+      ...company,
+      ...updateCompanyDto,
+    });
+
+    try {
+      return await this.companyRepository.save(company);
+    } catch (err) {
+      throw new InternalServerErrorException(
+        'Houve uma falha ao atualizar a empresa',
+      );
+    }
   }
 }

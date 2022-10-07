@@ -1,10 +1,20 @@
-import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  UseGuards,
+  Delete,
+  Patch,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { GetUser } from '../auth/decorator/current-user.decorator';
 import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
 import { User } from '../users/model/entities/user.entity';
 import { CompaniesService } from './companies.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
+import { UpdateCompanyDto } from './dto/update-company.dto';
 import { Company } from './entities/company.entity';
 
 @Controller('companies')
@@ -30,5 +40,19 @@ export class CompaniesController {
   @Get()
   findAll(@GetUser() user: User) {
     return this.companiesService.findAll(user);
+  }
+
+  @Patch(':id')
+  update(
+    @GetUser() user: User,
+    @Param('id') id: string,
+    @Body() updateCompanyDto: UpdateCompanyDto,
+  ): Promise<Company> {
+    return this.companiesService.update(id, updateCompanyDto, user);
+  }
+
+  @Delete(':id')
+  remove(@GetUser() user: User, @Param('id') id: string) {
+    return this.companiesService.remove(id, user);
   }
 }
