@@ -24,9 +24,14 @@ export class CreateResponsibleDto extends CreateAddressDto {
   @ApiProperty({
     type: String,
   })
-  @IsNotEmpty({
-    message: 'Informe o ID da empresa',
-  })
+  @IsOptional()
   @IsString()
   companyId: string;
+
+  @ApiProperty({
+    type: String,
+  })
+  @IsOptional()
+  @IsString()
+  placeId: string;
 }

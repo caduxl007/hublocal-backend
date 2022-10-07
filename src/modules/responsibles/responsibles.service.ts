@@ -1,8 +1,13 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AddressService } from '../address/address.service';
 import { CompaniesService } from '../companies/companies.service';
+import { PlacesService } from '../places/places.service';
 import { User } from '../users/model/entities/user.entity';
 import { CreateResponsibleDto } from './dto/create-responsible.dto';
 import { UpdateResponsibleDto } from './dto/update-responsible.dto';
@@ -16,52 +21,62 @@ export class ResponsiblesService {
 
     private readonly addressService: AddressService,
     private readonly companiesService: CompaniesService,
+    private readonly placesService: PlacesService,
   ) {}
 
   async create(
     createResponsibleDto: CreateResponsibleDto,
     user: User,
   ): Promise<Responsible> {
-    const { name, telephone, isMain, companyId } = createResponsibleDto;
+    const { name, telephone, isMain, companyId, placeId } =
+      createResponsibleDto;
 
-    const company = await this.companiesService.findOne(companyId, user);
-    const address = await this.addressService.create(createResponsibleDto);
+    if (!companyId && !placeId) {
+      throw new BadRequestException(
+        'Você precisa informar o ID de uma empresa ou local',
+      );
+    }
 
-    if (isMain) {
-      await this.updateIsMain(companyId);
+    if (companyId && placeId) {
+      throw new BadRequestException(
+        'O responsável so pode pertencer a uma empresa ou um local',
+      );
     }
 
     const responsible = this.responsiblesRepository.create({
       name,
       telephone,
       isMain,
-      address,
-      company,
     });
 
-    try {
-      return this.responsiblesRepository.save(responsible);
-    } catch (err) {
-      throw new InternalServerErrorException(
-        'Houve uma falha ao tentar criar um responsavel',
-      );
+    if (companyId) {
+      const company = await this.companiesService.findOne(companyId, user);
+      responsible.company = company;
+    } else {
+      const place = await this.placesService.findOne(placeId);
+      responsible.place = place;
     }
-  }
 
-  findAll() {
-    return `This action returns all responsibles`;
-  }
+    const address = await this.addressService.create(createResponsibleDto);
+    responsible.address = address;
 
-  findOne(id: number) {
-    return `This action returns a #${id} responsible`;
-  }
+    if (isMain) {
+      await this.updateIsMain(companyId);
+    }
 
-  update(id: number, updateResponsibleDto: UpdateResponsibleDto) {
-    return `This action updates a #${id} responsible`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} responsible`;
+    try {
+      return await this.responsiblesRepository.save(responsible);
+    } catch (err) {
+      if (err.code === '23505') {
+        throw new BadRequestException(
+          'Já existe um responsavel com esse telefone',
+        );
+      } else {
+        throw new InternalServerErrorException(
+          'Houve uma falha ao tentar criar um responsavel',
+        );
+      }
+    }
   }
 
   async updateIsMain(idCompany: string): Promise<void> {
