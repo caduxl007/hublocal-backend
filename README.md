@@ -31,7 +31,7 @@ E lógico é bom ter um editor para trabalhar com o código como [VSCode](https:
 
 ```bash
 # Clone este repositório
-$ git clone <https://github.com/caduxl007/hublocal-backend-.git>
+$ git clone <https://github.com/caduxl007/hublocal-backend.git>
 
 # Após instalar o docker execute no terminal/cmd
 $ docker run --name "nome-que-quiser" -e POSTGRES_PASSWORD=docker -p 5434:5432 -d postgres
@@ -42,7 +42,7 @@ $ port: 5434
 
 
 # Acesse a pasta do projeto backend no terminal/cmd
-$ cd hublocal-backend-
+$ cd hublocal-backend
 
 Instale as dependências
 $ yarn
