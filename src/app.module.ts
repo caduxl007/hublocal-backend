@@ -20,7 +20,6 @@ import { TicketsModule } from './modules/tickets/tickets.module';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
       autoLoadEntities: true,
-      synchronize: Boolean(process.env.DB_SYNC),
       ssl:
         process.env.NODE_ENV != 'production'
           ? false
@@ -28,6 +27,10 @@ import { TicketsModule } from './modules/tickets/tickets.module';
               rejectUnauthorized: false,
             },
       logging: true,
+      synchronize: process.env.NODE_ENV === 'production' ? false : true,
+      dropSchema: false,
+      entities: [`${__dirname}/src/**/**.entity{.ts,.js}`],
+      migrations: [`${__dirname}/src/migrations/**/*{.ts,.js}`],
     }),
     UsersModule,
     AuthModule,
