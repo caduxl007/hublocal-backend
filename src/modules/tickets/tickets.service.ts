@@ -75,6 +75,9 @@ export class TicketsService {
     ticket.title = `${ticket.id} - ${place.name}`;
 
     try {
+      ticket = await this.ticketsRepository.save(ticket);
+      ticket.title = `${ticket.id} - ${place.name}`;
+
       return await this.ticketsRepository.save(ticket);
     } catch (err) {
       throw new InternalServerErrorException(
