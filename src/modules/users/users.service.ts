@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -9,19 +10,17 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './model/dto/create-user.dto';
 import { User } from './model/entities/user.entity';
-import { IUsersService } from './model/interfaces/users-service.interface';
 import { errorMessages } from 'src/shared/constants/error-messages';
 
 @Injectable()
-export class UsersService implements IUsersService {
+export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
   ) {}
 
-  async create(dto: CreateUserDto) {
+  async create(dto: CreateUserDto): Promise<User> {
     const { name, email, password } = dto;
-    //TO-DO: Validar e-mail
 
     const hashedPassword = await this.hashedPassword(password);
 
@@ -34,9 +33,13 @@ export class UsersService implements IUsersService {
     try {
       return await this.usersRepository.save(user);
     } catch (err) {
-      throw new InternalServerErrorException(
-        errorMessages.USER.ERROR_CREATE_USER,
-      );
+      if (err.code === '23505') {
+        throw new BadRequestException('E-mail já está em uso.');
+      } else {
+        throw new InternalServerErrorException(
+          errorMessages.USER.ERROR_CREATE_USER,
+        );
+      }
     }
   }
 
@@ -52,8 +55,6 @@ export class UsersService implements IUsersService {
       throw new NotFoundException(errorMessages.USER.USER_NOT_EXISTS);
     }
 
-    delete user.password;
-
     return user;
   }
 
@@ -64,10 +65,16 @@ export class UsersService implements IUsersService {
       },
     });
 
-    if (user && compare(password, user.password)) {
+    if (!user) {
+      throw new BadRequestException(errorMessages.AUTH.INVALID_CREDENTIALS);
+    }
+
+    const verifyPassword = await compare(password, user?.password);
+
+    if (user && verifyPassword) {
       return user;
     } else {
-      throw new UnauthorizedException(errorMessages.AUTH.INVALID_CREDENTIALS);
+      throw new BadRequestException(errorMessages.AUTH.INVALID_CREDENTIALS);
     }
   }
 
